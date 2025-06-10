@@ -3,7 +3,7 @@ Solar2D plugin for Tiny C Compiler.
 
 # Summary
 
-This started with Jérôme Vuarand's TinyCC plugin, which was featured in [Gems](https://www.lua.org/gems/) ([book](https://www.lua.org/gems/lpg.pdf). (There are bits of it there yet, although it's got a different focus.)
+This started with Jérôme Vuarand's TinyCC plugin, which was featured in [Gems](https://www.lua.org/gems/) ([book](https://www.lua.org/gems/lpg.pdf)). (There are bits of it there yet, although it's got a different focus.)
 
 This ties it into [Solar2D](https://solar2d.com)'s C APIs, letting you use them and also play with a lot of C libraries out in the wild. This is useful, for instance, to prototype plugins on desktop (currently you wouldn't be able to use it on mobile).
 
@@ -13,22 +13,22 @@ In your **build.settings**, add to your **plugins**: `{ ["plugin.solar2c"] = { p
 
 List of functions and methods, to be documented:
 
-`state = plugin.new()`
-`plugin.set_system_headers(path)`
+* `state = plugin.new()`
+* `plugin.set_system_headers(path)`
 
-`state:add_symbol(name, symbol)`
-`state:define_symbol(name, def="")`
-`state:compile(code str)`
-`state:add_file(name)`
-`state:add_multiple_files{ name1, ... }`
-`state:add_library(name)`
-`symbol = state:get_symbol(name)`
-`state:add_library_path(path)`
-`state:add_include_path(path)`
-`state:add_sysinclude_path(path)`
-`state:add_multiple_library_paths{ path1, ... }`
-`state:add_multiple_include_paths{ path1, ... }`
-`state:add_multiple_sysinclude_paths{ path1, ... }`
+* `state:add_symbol(name, symbol)`
+* `state:define_symbol(name, def="")`
+* `state:compile(code str)`
+* `state:add_file(name)`
+* `state:add_multiple_files{ name1, ... }`
+* `state:add_library(name)`
+* `symbol = state:get_symbol(name)`
+* `state:add_library_path(path)`
+* `state:add_include_path(path)`
+* `state:add_sysinclude_path(path)`
+* `state:add_multiple_library_paths{ path1, ... }`
+* `state:add_multiple_include_paths{ path1, ... }`
+* `state:add_multiple_sysinclude_paths{ path1, ... }`
 
 (TODO: `baseDir` in various... defaults to `system.ResourceDirectory`)
 
