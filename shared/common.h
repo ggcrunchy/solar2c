@@ -33,6 +33,11 @@
 #include "libtcc.h"
 #include "incbin.h"
 
+#ifdef WIN32
+	#ifndef PATH_MAX
+	#  define PATH_MAX 260
+	#endif
+#endif // WIN32
 //
 //
 //
