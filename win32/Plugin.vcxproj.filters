@@ -7,18 +7,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\shared\SimulatorPluginLibrary.cpp">
+    <ClCompile Include="..\shared\plugin.solar2c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\incbin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\miniz.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\tcc_bin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\win_details.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\data.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\libs_bin.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\shared\SimulatorPluginLibrary.h">
+    <ClInclude Include="..\shared\common.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <LuaToCpp Include="..\shared\simulator_plugin_library.lua">
+    <ClInclude Include="..\shared\incbin.h">
       <Filter>Source Files</Filter>
-    </LuaToCpp>
+    </ClInclude>
+    <ClInclude Include="..\shared\libtcc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\miniz.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
