@@ -255,9 +255,6 @@ static int lua__new(lua_State* L)
 
 	Paths * paths = lua_touserdata(L, lua_upvalueindex(2));
 
-	CoronaLog("TCC add sys include Corona path: %s", paths->Corona);
-	CoronaLog("TCC add sys include Lua path: %s", paths->Lua);
-
 	tcc_add_sysinclude_path(tcc, paths->Corona);
 	tcc_add_sysinclude_path(tcc, paths->Lua);
 	
@@ -265,14 +262,12 @@ static int lua__new(lua_State* L)
 	
 	if (!lua_isnil(L, -1)) tcc_add_sysinclude_path(tcc, lua_tostring(L, -1));
 	
-	CoronaLog("Include path: %s", GetFileInTempDir("include"));
 
 	tcc_add_include_path(tcc, GetFileInTempDir("include"));
 
 #ifdef WIN32
 	tcc_add_include_path(tcc, GetFileInTempDir("include/winapi"));
 
-	CoronaLog("Add Lib path: %s", GetFileInTempDir(NULL));
 	tcc_add_library_path(tcc, GetFileInTempDir(NULL));
 
 	tcc_add_library_path(tcc, GetFileInTempDir("library"));
