@@ -158,10 +158,14 @@ void PrepareToUnzip (lua_State * L)
 
 static bool ShouldIgnore (const char * filename)
 {
+#ifdef WIN32
+	return true;
+#elif _MAC
 	// Check for unrelated material introduced by the compressor on Mac.
 	const char prefix[] = "__MACOSX/";
 	
 	return strncmp(filename, prefix, strlen(prefix)) == 0;
+#endif 
 }
 
 //
