@@ -37,6 +37,8 @@
 	#ifndef PATH_MAX
 	#  define PATH_MAX 260
 	#endif
+
+	INCBIN_EXTERN(libs);
 #endif // WIN32
 //
 //
