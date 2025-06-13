@@ -40,19 +40,17 @@ void FixLib(void)
 
 void SetUpPaths(lua_State* L, Paths* paths)
 {
-	lua_createtable(L, 2, 0); // environment
-
 	lua_pushfstring(L, "%s\\Corona\\shared\\include\\Corona", getenv("CORONA_ROOT"));
 
-	strncpy(paths->Corona, lua_tostring(L, -1), PATH_MAX - 1);
-	
-	lua_rawseti(L, -2, 1); // anchor it
+	sprintf(paths->Corona, "%.*s", PATH_MAX - 1, lua_tostring(L, -1));
 
+	lua_pop(L, 1);
+	
 	lua_pushfstring(L, "%s\\Corona\\shared\\include\\lua", getenv("CORONA_ROOT"));
 
-	strncpy(paths->Lua, lua_tostring(L, -1), PATH_MAX - 1);
+	sprintf(paths->Lua, "%.*s", PATH_MAX - 1, lua_tostring(L, -1));
 
-	lua_rawseti(L, -2, 2);
+	lua_pop(L, 1);
 }
 
 #endif
