@@ -112,17 +112,21 @@ const char * GetFileInTempDir (const char * file)
 {
 	if (file)
 	{
-		tempfile_buf[tempfile_offset] = '/';
+#ifdef _WIN32
+		tempfile_buf[tempfile_offset] = '\\';  // Windows uses backslash
+#elif __APPLE__
+		tempfile_buf[tempfile_offset] = '/';   // Unix-like systems use forward slash
+#endif
 		
 		strcpy(tempfile_buf + tempfile_offset + 1, file);
 	}
-	
 	else
 	{
 		tempfile_buf[tempfile_offset] = '\0';
 	}
 
 	return tempfile_buf;
+
 }
 
 //
@@ -158,43 +162,48 @@ void PrepareToUnzip (lua_State * L)
 
 static bool ShouldIgnore (const char * filename)
 {
+#ifdef WIN32
+	return false;
+#else
 	// Check for unrelated material introduced by the compressor on Mac.
 	const char prefix[] = "__MACOSX/";
 	
 	return strncmp(filename, prefix, strlen(prefix)) == 0;
+#endif 
 }
 
 //
 //
 //
 
-void ExtractZip (const unsigned char buf[], const size_t buf_size)
+#ifdef __APPLE__
+void ExtractZip(const unsigned char buf[], const size_t buf_size)
 {
 	mz_zip_archive zip = { 0 };
-	
+
 	if (mz_zip_reader_init_mem(&zip, buf, buf_size, 0))
 	{
 		char filename[PATH_MAX];
 
 		/* ----- */
-		
+
 		mz_uint n = mz_zip_reader_get_num_files(&zip);
-		
+
 		for (mz_uint i = 0; i < n; ++i)
 		{
 			if (!mz_zip_reader_is_file_a_directory(&zip, i)) continue;
-			
+
 			mz_zip_reader_get_filename(&zip, i, filename, PATH_MAX);
 
 			MakeDirectory(GetFileInTempDir(filename));
 		}
-		
+
 		/* ----- */
-		
+
 		for (mz_uint i = 0; i < n; ++i)
 		{
 			mz_zip_reader_get_filename(&zip, i, filename, PATH_MAX);
-			
+
 			if (!mz_zip_reader_is_file_a_directory(&zip, i) && !ShouldIgnore(filename))
 			{
 				mz_zip_reader_extract_to_file(&zip, i, GetFileInTempDir(filename), 0);
@@ -202,7 +211,90 @@ void ExtractZip (const unsigned char buf[], const size_t buf_size)
 		}
 
 		/* ----- */
-		
+
 		mz_zip_reader_end(&zip);
 	}
 }
+#elif WIN32
+void ExtractZip(const unsigned char buf[], const size_t size, const char* dir)
+{
+	mz_zip_archive zip = { 0 };
+
+	if (mz_zip_reader_init_mem(&zip, buf, size, 0))
+	{
+		char filename[PATH_MAX], * pf = filename;
+		mz_uint remaining_size = PATH_MAX;
+
+		// Create root directory if specified
+		if (dir)
+		{
+			// Use platform-specific directory creation
+			_mkdir(GetFileInTempDir(dir));
+
+			strcpy(filename, dir);
+			pf += strlen(filename);
+
+			// Use platform-specific separator
+
+			* pf = '\\';
+
+			++pf;
+			remaining_size -= (mz_uint)(pf - filename);
+		}
+
+		// First pass: create directories
+		mz_uint n = mz_zip_reader_get_num_files(&zip);
+		for (mz_uint i = 0; i < n; ++i)
+		{
+			if (!mz_zip_reader_is_file_a_directory(&zip, i)) continue;
+
+			mz_zip_reader_get_filename(&zip, i, pf, remaining_size);
+
+			// Normalize path separators if needed
+			char* p = pf;
+			while (*p) {
+				if (*p == '/') *p = '\\';
+				p++;
+			}
+
+			// Create directory
+			_mkdir(GetFileInTempDir(filename));
+		}
+
+		// Second pass: extract files
+		for (mz_uint i = 0; i < n; ++i)
+		{
+			mz_zip_reader_get_filename(&zip, i, pf, remaining_size);
+
+			if (!mz_zip_reader_is_file_a_directory(&zip, i) && !ShouldIgnore(pf))
+			{
+				// Normalize path for Windows if needed
+
+				char* p = pf;
+				while (*p) {
+					if (*p == '/') *p = '\\';
+					p++;
+				}
+
+				const char* output_path = GetFileInTempDir(filename);
+
+				// Ensure parent directories exist (more important on Windows)
+
+				char path_copy[PATH_MAX];
+				strcpy(path_copy, output_path);
+				char* sep = path_copy;
+				while ((sep = strchr(sep, '\\'))) {
+					*sep = '\0';
+					_mkdir(path_copy);
+					*sep = '\\';
+					sep++;
+				}
+
+				mz_zip_reader_extract_to_file(&zip, i, output_path, 0);
+			}
+		}
+
+		mz_zip_reader_end(&zip);
+	}
+}
+#endif
