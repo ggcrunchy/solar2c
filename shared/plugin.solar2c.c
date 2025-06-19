@@ -262,9 +262,22 @@ static int lua__new(lua_State* L)
 	
 	if (!lua_isnil(L, -1)) tcc_add_sysinclude_path(tcc, lua_tostring(L, -1));
 	
+
 	tcc_add_include_path(tcc, GetFileInTempDir("include"));
+
+#ifdef WIN32
+	tcc_add_include_path(tcc, GetFileInTempDir("include/winapi"));
+
 	tcc_add_library_path(tcc, GetFileInTempDir(NULL));
-	
+
+	tcc_add_library_path(tcc, GetFileInTempDir("library"));
+	tcc_add_library(tcc, "lua");
+	tcc_add_library(tcc, "openAL32");
+	tcc_add_library(tcc, "CoronaLabs.Corona.Native");
+#elif __APPLE__
+	tcc_add_library_path(tcc, GetFileInTempDir(NULL));
+#endif
+
 	/* ----- */
 
 	TCCState** ptcc = lua_newuserdata(L, sizeof(TCCState*)); // headers?, state
@@ -310,7 +323,13 @@ static int lua__set_system_headers (lua_State * L)
 static void ExtractToTempDir (lua_State * L)
 {
 	PrepareToUnzip(L);
+#ifdef WIN32
+	ExtractZip(libsData, libsSize, "\\library");
+	ExtractZip(tccData, tccSize, NULL);
+#elif __APPLE__
 	ExtractZip(tccData, tccSize);
+#endif // WIN32
+
 	FixLib(); // rename the architecture-appropriate binary so TinyCC can find it
 }
 
@@ -360,6 +379,7 @@ static void CheckCoronaHeaders (lua_State * L, const Paths * paths)
 
 static void PopulatePaths (lua_State * L)
 {
+
 	ExtractToTempDir(L);
 	
 	/* ----- */
@@ -394,7 +414,6 @@ CORONA_EXPORT int luaopen_plugin_solar2c (lua_State * L)
 	// keys are all userdata, so a (string, string) pair can be
 	// smuggled in without conflict: this is how user-defined
 	// system headers, if any, are stored.
-	
 	lua_newtable(L); // plugin, anchor
 	
 	PopulatePaths(L); // plugin, anchor, paths
